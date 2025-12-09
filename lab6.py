@@ -2,9 +2,9 @@ import logging
 import os
 
 class FileNotFound(Exception):
-    """Файл не знайдено або файлу не існує"""
+    """File isnt exist"""
 class FileCorrupted(Exception):
-    """Файл пошкоджений або не підтримуваний формат"""
+    """File is damaged or not supported"""
 
 def logged(func):
     def wrapper(*args, **kwargs):
@@ -20,10 +20,10 @@ def logged(func):
 
         try:
             result = func(*args, **kwargs)
-            logger.info(f"Успішно виконано: {func.__name__}")
+            logger.info(f"Successfully completed: {func.__name__}")
             return result
         except Exception as e:
-            logger.error(f"Помилка у '{func.__name__}': {e}")
+            logger.error(f"Error in '{func.__name__}': {e}")
             raise
     return wrapper
 
@@ -31,7 +31,7 @@ class TextFileManager:
     def __init__(self, path: str):
         self.path = path
         if not os.path.exists(self.path):
-            raise FileNotFound(f"Файл '{self.path}' не знайдено! Перевірте шлях.")
+            raise FileNotFound(f"File '{self.path}' isnt found! check path.")
 
     @logged
     def read(self):
@@ -39,7 +39,7 @@ class TextFileManager:
             with open(self.path, 'r', encoding='utf-8') as file:
                 return file.read()
         except Exception as e:
-            raise FileCorrupted(f"Помилка читання: {e}")
+            raise FileCorrupted(f"Read error: {e}")
 
     @logged
     def write(self, content: str):
@@ -47,7 +47,7 @@ class TextFileManager:
             with open(self.path, 'w', encoding='utf-8') as file:
                 file.write(content)
         except Exception as e:
-            raise FileCorrupted(f"Помилка запису: {e}")
+            raise FileCorrupted(f"Rewriting error: {e}")
 
     @logged
     def append(self, content: str):
@@ -55,33 +55,25 @@ class TextFileManager:
             with open(self.path, 'a', encoding='utf-8') as file:
                 file.write(content)
         except Exception as e:
-            raise FileCorrupted(f"Помилка дописування: {e}")
+            raise FileCorrupted(f"Adding error: {e}")
 
 def menu():
-    print("")
-    print("    МЕНЮ ДІЙ")
-    print("")
-    print("1. Прочитати файл (Read)")
-    print("2. Перезаписати файл (Write)")
-    print("3. Дописати у файл (Append)")
-    print("4. Змінити файл")
-    print("exit. Вихід")
-    print("")
+    print("\n    ACTION MENU \n \n 1. Read file \n 2. Rewrite file \n 3. Add to file \n 4. Change file/file path \n 5. Exit\n")
 
 def get_file_manager():
     while True:
-        path = input("\nВведіть шлях до файлу (наприклад, my_notes.txt): ").strip()
+        path = input("\n Enter file path (example, my_notes.txt): ").strip()
         if not path:
-            print("Шлях не може бути порожнім.")
+            print("File path shouldnt be empty")
             continue
             
         try:
             fm = TextFileManager(path)
-            print(f"Успішно підключено до '{path}'")
+            print(f"Successfully connected to '{path}'")
             return fm
         except FileNotFound as e:
-            print(f"Помилка: {e}")
-            print("Спробуйте ввести інший шлях.")
+            print(f"Error: {e}")
+            print("Try enter other file path.")
 
 if __name__ == "__main__":
     print("Program launched")
@@ -91,36 +83,37 @@ if __name__ == "__main__":
 
     while True:
         menu()
-        choice = input("Ваш вибір: ").strip()
+        choice = input("Your choice: ").strip()
 
         try:
             if choice == "1":
-                print("\n    ВМІСТ ФАЙЛУ    ")
+                print("\n    FILE CONTENTS    ")
                 content = manager.read()
                 print(content)
 
             elif choice == "2":
-                text = input("Введіть текст для ЗАПИСУ (старий вміст видалиться): ")
+                text = input("Enter text for RECORD (old content will be deleted): ")
                 manager.write(text)
-                print("Успішно записано.")
+                print("Successfully recorded.")
 
             elif choice == "3":
-                text = input("Введіть текст для ДОПИСУВАННЯ (у кінець файлу): ")
+                text = input("Enter text for ADDing (at the end of the file): ")
                 manager.append("\n" + text) 
-                print("Успішно дописано.")
+                print("Successfully recorded.")
 
             elif choice == "4":
                 manager = get_file_manager()
 
             elif choice == "exit":
-                print("До побачення!")
+                print("Bye!")
                 break
             
             else:
-                print("Невірний вибір, спробуйте ще раз.")
+                print("Wrong choice , try again")
 
         except FileCorrupted as e:
-            print(f"\nОПЕРАЦІЯ НЕ ВДАЛАСЯ: {e}")
-            print("(Деталі помилки записано у лог)")
+            print(f"\n OPERATION FAILED: {e}")
+            print("(Error details are recorded in the log.)")
         except Exception as e:
-            print(f"\nНЕОЧІКУВАНА ПОМИЛКА: {e}")
+            print(f"\n UNEXPECTED ERROR: {e}")
+
